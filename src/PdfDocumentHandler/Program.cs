@@ -1,20 +1,15 @@
-﻿using System;
-using System.Windows.Forms;
+﻿namespace PdfDocumentHandler;
 
-
-namespace PdfDocumentHandler
+public static class Program
 {
-    public static class Program
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    public static void Main()
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        public static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new PdfDocumentHandlerForm());
-        }
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+        Application.Run(new PdfDocumentHandlerForm());
     }
 }
