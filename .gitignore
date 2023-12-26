@@ -64,13 +64,16 @@ App_Data/
 __*.htm
 
 # Application
-thumbs.db
 .vs
 .vs/config/applicationhost.config
-publishprofile.xml
 .idea
+thumbs.db
+publishprofile.xml
 dist
 *.sqlite
 *.lock.json
+
+# Setup
+*.msi
 
 ~*.*
