@@ -11,15 +11,19 @@
     <Company>iStruction</Company>
     <Product>PdfDocumentHandler</Product>
     <Description>Application to process scanned PDF documents</Description>
-    <Copyright>Copyright © iStruction 2014-2023</Copyright>
+    <Copyright>Copyright © iStruction 2014-2024</Copyright>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionMajor>3</VersionMajor>
-    <VersionMinor>0</VersionMinor>
-    <VersionPatch>0</VersionPatch>
+    <ApplicationIcon>PdfDocumentHandler.ico</ApplicationIcon>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="PdfDocumentHandler.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FreeSpire.PDF" Version="8.6.0" />
