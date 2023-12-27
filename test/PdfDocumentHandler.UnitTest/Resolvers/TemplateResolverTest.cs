@@ -42,7 +42,7 @@ public class TemplateResolverTest
         var resolvedString = templateResolver.Resolve(filename, new Dictionary<string, object>());
 
         // Assert
-        Assert.Equal("template", resolvedString);
+        Assert.Equal("template.pdf", resolvedString);
     }
 
 
@@ -58,7 +58,7 @@ public class TemplateResolverTest
             new Dictionary<string, object> { { "Datum", new DateTime(2017, 03, 09) } });
 
         // Assert
-        Assert.Equal("2017-03-09", resolvedString);
+        Assert.Equal("2017-03-09.pdf", resolvedString);
     }
 
 
@@ -74,7 +74,7 @@ public class TemplateResolverTest
             new Dictionary<string, object> { { "Omschrijving", "Dit is een omschrijving" } });
 
         // Assert
-        Assert.Equal("Dit is een omschrijving", resolvedString);
+        Assert.Equal("Dit is een omschrijving.pdf", resolvedString);
     }
 
 
@@ -93,7 +93,7 @@ public class TemplateResolverTest
         });
 
         // Assert
-        Assert.Equal("2017-03-09 Dit is een omschrijving", resolvedString);
+        Assert.Equal("2017-03-09 Dit is een omschrijving.pdf", resolvedString);
     }
 
 
@@ -112,7 +112,7 @@ public class TemplateResolverTest
         });
 
         // Assert
-        Assert.Equal("2017-03-09", resolvedString);
+        Assert.Equal("2017-03-09.pdf", resolvedString);
     }
 
 
@@ -127,7 +127,7 @@ public class TemplateResolverTest
         var resolvedString = templateResolver.Resolve(filename);
 
         // Assert
-        Assert.Equal("NS Factuur 2017000001", resolvedString);
+        Assert.Equal("NS Factuur 2017000001.pdf", resolvedString);
     }
 
 
@@ -147,7 +147,7 @@ public class TemplateResolverTest
         });
 
         // Assert
-        Assert.Equal("2017-03-20 NS Factuur 2017000001 (3-2017)", resolvedString);
+        Assert.Equal("2017-03-20 NS Factuur 2017000001 (3-2017).pdf", resolvedString);
     }
 
 
@@ -162,7 +162,7 @@ public class TemplateResolverTest
             new Dictionary<string, object> { { "Datum", new DateTime(2017, 3, 28) } });
 
         // Assert
-        Assert.Equal("28-03-2017", resolvedString);
+        Assert.Equal("28-03-2017.pdf", resolvedString);
     }
 
 
@@ -177,7 +177,7 @@ public class TemplateResolverTest
             templateResolver.Resolve("img-20170328.pdf", new Dictionary<string, object> { { "Maand", 1 } });
 
         // Assert
-        Assert.Equal("01", resolvedString);
+        Assert.Equal("01.pdf", resolvedString);
     }
 
 
@@ -192,6 +192,6 @@ public class TemplateResolverTest
             new Dictionary<string, object> { { "Maand", 1 }, { "MaandNaam", "Januari" } });
 
         // Assert
-        Assert.Equal("01 (Januari)", resolvedString);
+        Assert.Equal("01 (Januari).pdf", resolvedString);
     }
 }

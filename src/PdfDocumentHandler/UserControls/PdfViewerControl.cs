@@ -10,11 +10,9 @@ public partial class PdfViewerControl : UserControl
     // Spire only allows the first three pages to be converted into an image.
     private const int MaxNumberOfPages = 3;
 
-    private Font _fontAwesome;
-
-    private int         _currentPageNumber;
-    private PdfDocument _pdfDocument;
-    private readonly List<string> _excludedFileNames = new List<string>();
+    private int                   _currentPageNumber;
+    private PdfDocument?          _pdfDocument;
+    private readonly List<string> _excludedFileNames = new();
 
 
     [DllImport("gdi32.dll")]
@@ -24,18 +22,18 @@ public partial class PdfViewerControl : UserControl
     public PdfViewerControl()
     {
         InitializeComponent();
-        InitializeFont();
+        var fontAwesome = InitializeFont();
 
-        buttonRotateLeft.Font      = _fontAwesome;
+        buttonRotateLeft.Font      = fontAwesome;
         buttonRotateLeft.Text      = @"";
         buttonRotateLeft.Enabled   = false;
-        buttonRotateRight.Font     = _fontAwesome;
+        buttonRotateRight.Font     = fontAwesome;
         buttonRotateRight.Text     = @"";
         buttonRotateRight.Enabled  = false;
-        buttonNextPage.Font        = _fontAwesome;
+        buttonNextPage.Font        = fontAwesome;
         buttonNextPage.Text        = @"";
         buttonNextPage.Enabled     = false;
-        buttonPreviousPage.Font    = _fontAwesome;
+        buttonPreviousPage.Font    = fontAwesome;
         buttonPreviousPage.Text    = @"";
         buttonPreviousPage.Enabled = false;
 
@@ -49,10 +47,10 @@ public partial class PdfViewerControl : UserControl
     /// It adds the font to the 'system' (with AddFontMemResourceEx) otherwise
     /// showing the icons will screw up.
     /// </summary>
-    private void InitializeFont()
+    private Font InitializeFont()
     {
         var fontLength = Properties.Resources.fontawesome_webfont.Length;
-        var fontData = Properties.Resources.fontawesome_webfont;
+        var fontData   = Properties.Resources.fontawesome_webfont;
 
         var data = Marshal.AllocCoTaskMem(fontLength);
 
@@ -70,7 +68,7 @@ public partial class PdfViewerControl : UserControl
         // Free up the unsafe memory
         Marshal.FreeCoTaskMem(data);
 
-        _fontAwesome = new Font(privateFontCollection.Families[0], 10.0f, FontStyle.Regular);
+        return new Font(privateFontCollection.Families[0], 10.0f, FontStyle.Regular);
     }
 
 
@@ -145,6 +143,11 @@ public partial class PdfViewerControl : UserControl
 
     private void ShowPdf()
     {
+        if (_pdfDocument == null)
+        {
+            return;
+        }
+
         var numberOfPages = NumberOfPages;
         int index;
 
@@ -189,6 +192,11 @@ public partial class PdfViewerControl : UserControl
 
     private void UpdatePagesLabel()
     {
+        if (_pdfDocument == null)
+        {
+            return;
+        }
+
         // Show the real number of pages.
         var numberOfPages = _pdfDocument.Pages.Count;
         labelPages.Text = $@"Pagina {_currentPageNumber}/{numberOfPages}";

@@ -170,15 +170,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:PdfDocumentHandler"
-        "ProductCode" = "8:{F4149862-EFEB-4AA9-908D-A817659099F3}"
-        "PackageCode" = "8:{95EFCD09-30CA-4C42-8D53-23991916EC9C}"
+        "ProductCode" = "8:{8FA759AD-D6CE-4DF9-AA76-D4222A3F537B}"
+        "PackageCode" = "8:{3A2EAD8E-E370-42F8-B717-519DA9E0C0C6}"
         "UpgradeCode" = "8:{46FC1A04-501D-4742-B90A-3F8DECBA5206}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:2.0.6"
+        "ProductVersion" = "8:3.0.1"
         "Manufacturer" = "8:iStruction Software Services & Webdesign"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -748,7 +748,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_EB0777FF96E44F9EAE49F669089BD906"
             {
-            "SourcePath" = "8:..\\..\\src\\PdfDocumentHandler\\obj\\Debug\\net8.0-windows\\PdfDocumentHandler.exe"
+            "SourcePath" = "8:..\\..\\src\\PdfDocumentHandler\\obj\\Release\\net8.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_2FD01585DBA9427387D9006242904AB1"
@@ -772,6 +772,7 @@
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
+                "ExcludeFilter" = "8:*.pdb"
                 }
             }
         }

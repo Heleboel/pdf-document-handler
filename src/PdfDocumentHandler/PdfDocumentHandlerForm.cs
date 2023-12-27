@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using System.Configuration;
-using PdfDocumentHandler.Models;
+﻿using PdfDocumentHandler.Models;
 using PdfDocumentHandler.UserControls;
 
 
@@ -8,7 +6,7 @@ namespace PdfDocumentHandler;
 
 public partial class PdfDocumentHandlerForm : Form
 {
-    private readonly PdfDocumentHandlerSettings _pdfDocumentHandlerSettings = new PdfDocumentHandlerSettings();
+    private readonly PdfDocumentHandlerSettings _pdfDocumentHandlerSettings = new();
 
 
     public PdfDocumentHandlerForm()
@@ -19,36 +17,11 @@ public partial class PdfDocumentHandlerForm : Form
 
     private void PdfDocumentHandlerForm_Load(object sender, EventArgs e)
     {
-        KeyUp += sourceControl.SourceControl_KeyUp;
-
-        //Associate settings property event handlers.
-        _pdfDocumentHandlerSettings.SettingChanging += pdfDocumentHandlerSettings_SettingChanging;
-        _pdfDocumentHandlerSettings.SettingsSaving  += pdfDocumentHandlerSettings_SettingsSaving;
-
-        //Data bind settings properties with straightforward associations.
-        var bndLocation = new Binding("Location", _pdfDocumentHandlerSettings, "FormLocation", true, DataSourceUpdateMode.OnPropertyChanged);
-        DataBindings.Add(bndLocation);
-
         LoadSettings();
-    }
 
+        sourceControl.RefreshFiles();
 
-    private static void pdfDocumentHandlerSettings_SettingChanging(object sender, SettingChangingEventArgs e)
-    {
-        //var settingName = e.SettingName;
-        //var newValue = e.NewValue;
-    }
-
-
-    private static void pdfDocumentHandlerSettings_SettingsSaving(object sender, CancelEventArgs e)
-    {
-        //Should check for settings changes first.
-        //var dialogResult = MessageBox.Show(@"Save current values for application settings?", @"Save Settings", MessageBoxButtons.YesNo);
-        //
-        //if (DialogResult.No == dialogResult)
-        //{
-        //    e.Cancel = true;
-        //}
+        KeyUp += sourceControl.SourceControl_KeyUp!;
     }
 
 
@@ -80,6 +53,11 @@ public partial class PdfDocumentHandlerForm : Form
 
     private void SourceControl_CopyFile(object sender, CopyEventArgs e)
     {
+        if (string.IsNullOrWhiteSpace(e.FileName))
+        {
+            return;
+        }
+
         if (!destinationControl.CopyFile(e.FileName))
         {
             e.Canceled = true;
@@ -89,6 +67,11 @@ public partial class PdfDocumentHandlerForm : Form
 
     private void SourceControl_MoveFile(object sender, MoveEventArgs e)
     {
+        if (string.IsNullOrWhiteSpace(e.FileName))
+        {
+            return;
+        }
+
         if (!destinationControl.MoveFile(e.FileName))
         {
             e.Canceled = true;
@@ -120,7 +103,15 @@ public partial class PdfDocumentHandlerForm : Form
         }
 
         // Assign Size property, since databinding to Size doesn't work well.
-        Size = _pdfDocumentHandlerSettings.FormSize;
+        if (_pdfDocumentHandlerSettings.FormState == FormWindowState.Maximized)
+        {
+            WindowState = _pdfDocumentHandlerSettings.FormState;
+        }
+        else
+        {
+            Location = _pdfDocumentHandlerSettings.FormLocation;
+            Size     = _pdfDocumentHandlerSettings.FormSize;
+        }
 
         splitContainer1.SplitterDistance = _pdfDocumentHandlerSettings.SplitterDistance;
         sourceControl.SourceFolders      = _pdfDocumentHandlerSettings.SourceFolders;
@@ -132,8 +123,18 @@ public partial class PdfDocumentHandlerForm : Form
     {
         _pdfDocumentHandlerSettings.SourceFolders    = sourceControl.SourceFolders;
         _pdfDocumentHandlerSettings.Destinations     = destinationControl.Destinations.OrderBy(d => d.Name).ToList();
-        _pdfDocumentHandlerSettings.FormSize         = Size;
         _pdfDocumentHandlerSettings.SplitterDistance = splitContainer1.SplitterDistance;
+
+        if (WindowState == FormWindowState.Normal)
+        {
+            _pdfDocumentHandlerSettings.FormState    = WindowState;
+            _pdfDocumentHandlerSettings.FormSize     = Size;
+            _pdfDocumentHandlerSettings.FormLocation = Location;
+        }
+        else
+        {
+            _pdfDocumentHandlerSettings.FormState = WindowState;
+        }
 
         _pdfDocumentHandlerSettings.Save();
     }
