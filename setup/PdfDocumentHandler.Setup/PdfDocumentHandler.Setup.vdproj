@@ -170,15 +170,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:PdfDocumentHandler"
-        "ProductCode" = "8:{F4149862-EFEB-4AA9-908D-A817659099F3}"
-        "PackageCode" = "8:{95EFCD09-30CA-4C42-8D53-23991916EC9C}"
+        "ProductCode" = "8:{02C5FBBD-BEE8-46CD-80F8-E48E99D234A0}"
+        "PackageCode" = "8:{3577B7A6-4EEE-4171-8A6E-E30DC70B3357}"
         "UpgradeCode" = "8:{46FC1A04-501D-4742-B90A-3F8DECBA5206}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:2.0.6"
+        "ProductVersion" = "8:3.0.0"
         "Manufacturer" = "8:iStruction Software Services & Webdesign"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -772,6 +772,7 @@
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
+                "ExcludeFilter" = "8:*.pdb"
                 }
             }
         }
