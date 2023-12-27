@@ -1,27 +1,22 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
 
 namespace PdfDocumentHandler.Resolvers;
 
-public class TemplateResolver
+public class TemplateResolver(string template)
 {
-    public TemplateResolver()
+    public string Template { get; } = template;
+
+
+    public TemplateResolver() : this(string.Empty)
     {
     }
-
-
-    public TemplateResolver(string template)
-    {
-        Template = template;
-    }
-
-
-    public string Template { get; }
 
 
     public string Resolve(string filename)
     {
-        return Resolve(filename, new Dictionary<string, object>());
+        return Resolve(filename, new());
     }
 
 
@@ -32,11 +27,11 @@ public class TemplateResolver
             return filename;
         }
 
-        var template = Template;
+        var localTemplate = Template;
 
-        if (template.Contains("{RegEx:"))
+        if (localTemplate.Contains("{RegEx:"))
         {
-            template = ResolveRegEx(template, filename);
+            localTemplate = ResolveRegEx(localTemplate, filename);
         }
 
         foreach (var kvpair in values)
@@ -44,30 +39,38 @@ public class TemplateResolver
             var key   = kvpair.Key;
             var value = kvpair.Value;
 
-            if (template.Contains($"{{{key}}}"))
+            if (localTemplate.Contains($"{{{key}}}"))
             {
-                if (value is DateTime)
+                if (value is DateTime time)
                 {
-                    template = template.Replace($"{{{key}}}", ((DateTime)value).ToString("yyyy-MM-dd"));
+                    localTemplate = localTemplate.Replace($"{{{key}}}", time.ToString("yyyy-MM-dd"));
                 }
-                if (value is string)
+                if (value is string s)
                 {
-                    template = template.Replace($"{{{key}}}", value as string);
+                    localTemplate = localTemplate.Replace($"{{{key}}}", s);
                 }
-                if (value is int)
+                if (value is int i)
                 {
-                    template = template.Replace($"{{{key}}}", value.ToString());
+                    localTemplate = localTemplate.Replace($"{{{key}}}", i.ToString());
                 }
             }
 
-            if (template.Contains($"{{{key}:"))
+            if (localTemplate.Contains($"{{{key}:"))
             {
                 // The template contains some formatting string.
-                template = ResolveKeyWithFormatting(template, key, value);
+                localTemplate = ResolveKeyWithFormatting(localTemplate, key, value);
             }
         }
 
-        return template.Trim();
+        localTemplate = localTemplate.Trim();
+
+        // Allways add a '.pdf' extension if it's not there
+        if (!localTemplate.EndsWith(".pdf", true, CultureInfo.InvariantCulture))
+        {
+            localTemplate += ".pdf";
+        }
+
+        return localTemplate;
     }
 
 
