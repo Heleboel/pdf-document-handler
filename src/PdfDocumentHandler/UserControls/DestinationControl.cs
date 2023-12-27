@@ -11,7 +11,7 @@ public partial class DestinationControl : UserControl
     private const string CopyFileText = "Kopieer bestand";
 
 
-    private List<Destination> _destinations = new List<Destination>();
+    private List<Destination> _destinations = new();
 
 
     public DestinationControl()
@@ -23,10 +23,10 @@ public partial class DestinationControl : UserControl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<Destination> Destinations
     {
-        get { return _destinations; }
+        get => _destinations;
         set
         {
-            _destinations = value ?? new List<Destination>();
+            _destinations = value;
             PopulateListView();
         }
     }
@@ -36,7 +36,14 @@ public partial class DestinationControl : UserControl
     {
         var destination = GetSelectedDestination();
         var newFileName = GetNewFileName(sourceFile, destination, CopyFileText);
+
+        if (string.IsNullOrEmpty(newFileName))
+        {
+            return false;
+        }
+
         var overwrite = GetOverwrite(newFileName, CopyFileText);
+
         return CopyFileInternal(sourceFile, newFileName, overwrite);
     }
 
@@ -45,17 +52,25 @@ public partial class DestinationControl : UserControl
     {
         var destination = GetSelectedDestination();
         var newFileName = GetNewFileName(sourceFile, destination, MoveFileText);
+
+        if (string.IsNullOrEmpty(newFileName))
+        {
+            return false;
+        }
+
         var overwrite = GetOverwrite(newFileName, MoveFileText);
+
         return MoveFileInternal(sourceFile, newFileName, overwrite);
     }
 
 
-    private Destination GetSelectedDestination()
+    private Destination? GetSelectedDestination()
     {
         if (listViewDestinations.SelectedItems.Count > 0)
         {
             return listViewDestinations.SelectedItems[0].Tag as Destination;
         }
+
         return null;
     }
 
@@ -69,7 +84,8 @@ public partial class DestinationControl : UserControl
 
         if (File.Exists(filename))
         {
-            return MessageBox.Show($@"Het bestand {filename} bestaat al. Overschrijven?", caption, MessageBoxButtons.YesNo) == DialogResult.Yes;
+            return MessageBox.Show($@"Het bestand {filename} bestaat al. Overschrijven?", caption,
+                MessageBoxButtons.YesNo) == DialogResult.Yes;
         }
 
         return false;
@@ -88,15 +104,18 @@ public partial class DestinationControl : UserControl
     private void PopulateListView()
     {
         listViewDestinations.Items.Clear();
-        if (_destinations != null && _destinations.Count > 0)
+
+        if (_destinations.Any())
         {
             foreach (var destination in _destinations)
             {
                 AddDestinationToListView(destination);
             }
+
             listViewDestinations.Refresh();
         }
     }
+
 
     private void AddDestinationToListView(Destination destination)
     {
@@ -119,9 +138,8 @@ public partial class DestinationControl : UserControl
         if (listViewDestinations.SelectedItems.Count > 0)
         {
             var listViewItem = listViewDestinations.SelectedItems[0];
-            var destinationInListView = listViewItem.Tag as Destination;
 
-            if (destinationInListView != null && destinationInListView.Id == destination.Id)
+            if (listViewItem.Tag is Destination destinationInListView && destinationInListView.Id == destination.Id)
             {
                 listViewItem.Text        = destination.Name;
                 listViewItem.Name        = destination.Name;
@@ -139,9 +157,8 @@ public partial class DestinationControl : UserControl
         if (listViewDestinations.SelectedItems.Count > 0)
         {
             var listViewItem = listViewDestinations.SelectedItems[0];
-            var destinationInListView = listViewItem.Tag as Destination;
 
-            if (destinationInListView != null && destinationInListView.Id == destination.Id)
+            if (listViewItem.Tag is Destination destinationInListView && destinationInListView.Id == destination.Id)
             {
                 listViewItem.Remove();
             }
@@ -196,9 +213,9 @@ public partial class DestinationControl : UserControl
         if (listViewDestinations.SelectedItems.Count > 0)
         {
             var formDestination = new FormDestination();
-            var destination = new Destination(listViewDestinations.SelectedItems[0].Tag as Destination);
 
-            if (formDestination.ShowDialog(destination) == DialogResult.OK)
+            if (listViewDestinations.SelectedItems[0].Tag is Destination destination &&
+                formDestination.ShowDialog(destination) == DialogResult.OK)
             {
                 destination = formDestination.GetDestination();
                 AddDestination(destination);
@@ -212,9 +229,9 @@ public partial class DestinationControl : UserControl
         if (listViewDestinations.SelectedItems.Count > 0)
         {
             var formDestination = new FormDestination();
-            var destination = listViewDestinations.SelectedItems[0].Tag as Destination;
 
-            if (formDestination.ShowDialog(destination) == DialogResult.OK)
+            if (listViewDestinations.SelectedItems[0].Tag is Destination destination &&
+                formDestination.ShowDialog(destination) == DialogResult.OK)
             {
                 destination = formDestination.GetDestination();
                 UpdateDestination(destination);
@@ -228,13 +245,16 @@ public partial class DestinationControl : UserControl
         // Show dialog to ask for acknowledge.
         if (listViewDestinations.SelectedItems.Count == 1)
         {
-            var result = MessageBox.Show(@"Bestemming verwijderen?", @"Verwijder bestemming", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            var result = MessageBox.Show(@"Bestemming verwijderen?", @"Verwijder bestemming",
+                MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
 
             if (result == DialogResult.OK)
             {
                 // Delete selected destination
-                var destination = listViewDestinations.SelectedItems[0].Tag as Destination;
-                DeleteDestination(destination);
+                if (listViewDestinations.SelectedItems[0].Tag is Destination destination)
+                {
+                    DeleteDestination(destination);
+                }
             }
         }
     }
@@ -344,11 +364,16 @@ public partial class DestinationControl : UserControl
     #endregion
 
 
-    private static string GetNewFileName(string sourceFile, Destination destination, string captionText)
+    private static string? GetNewFileName(
+        string sourceFile,
+        Destination? destination,
+        string captionText
+    )
     {
         if (string.IsNullOrEmpty(sourceFile) || destination == null)
         {
-            MessageBox.Show(@"Geen bron of bestemming geselecteerd.", captionText, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(@"Geen bron of bestemming geselecteerd.", captionText, MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
             return null;
         }
 
@@ -377,12 +402,14 @@ public partial class DestinationControl : UserControl
         }
         catch (IOException ioException)
         {
-            MessageBox.Show(@"Het bestand bestaat al, kies een andere bestandsnaam. " + ioException.Message, MoveFileText, MessageBoxButtons.OK);
+            MessageBox.Show(@"Het bestand bestaat al, kies een andere bestandsnaam. " + ioException.Message,
+                MoveFileText, MessageBoxButtons.OK);
         }
         catch (Exception exception)
         {
             MessageBox.Show(@"Er ging iets fout: " + exception.Message, MoveFileText, MessageBoxButtons.OK);
         }
+
         return false;
     }
 
@@ -399,7 +426,8 @@ public partial class DestinationControl : UserControl
         }
         catch (IOException ioException)
         {
-            MessageBox.Show(@"Het bestand bestaat al, kies een andere bestandsnaam. " + ioException.Message, CopyFileText, MessageBoxButtons.OK);
+            MessageBox.Show(@"Het bestand bestaat al, kies een andere bestandsnaam. " + ioException.Message,
+                CopyFileText, MessageBoxButtons.OK);
         }
         catch (Exception exception)
         {

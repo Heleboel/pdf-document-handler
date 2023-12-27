@@ -7,9 +7,9 @@ namespace PdfDocumentHandler.UserControls;
 
 public partial class SourceControl : UserControl
 {
-    public event MoveFileEventHandler MoveFile;
-    public event CopyFileEventHandler CopyFile;
-    public event SelectedIndexChangedEventHandler SelectedIndexChanged;
+    public event MoveFileEventHandler? MoveFile;
+    public event CopyFileEventHandler? CopyFile;
+    public event SelectedIndexChangedEventHandler? SelectedIndexChanged;
 
 
     public SourceControl()
@@ -21,14 +21,8 @@ public partial class SourceControl : UserControl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<string> SourceFolders
     {
-        get
-        {
-            return GetSourceFoldersFromComboBox();
-        }
-        set
-        {
-            PopulateComboBox(value);
-        }
+        get => GetSourceFoldersFromComboBox();
+        set => PopulateComboBox(value);
     }
 
 
@@ -52,7 +46,7 @@ public partial class SourceControl : UserControl
     {
         comboBoxSourceFolders.Items.Clear();
 
-        if (sourceFolders != null && sourceFolders.Count > 0)
+        if (sourceFolders.Any())
         {
             var counter = 0;
             foreach (var sourceFolder in sourceFolders)
@@ -65,6 +59,7 @@ public partial class SourceControl : UserControl
                     break;
                 }
             }
+
             // Set selected item
             comboBoxSourceFolders.SelectedIndex = 0;
         }
@@ -141,12 +136,13 @@ public partial class SourceControl : UserControl
     }
 
 
-    private string GetSelectedSourceFolder()
+    private string? GetSelectedSourceFolder()
     {
         if (comboBoxSourceFolders.SelectedIndex >= 0)
         {
             return comboBoxSourceFolders.SelectedItem as string;
         }
+
         return comboBoxSourceFolders.Text;
     }
 
@@ -155,12 +151,13 @@ public partial class SourceControl : UserControl
 
     #region ListView PDF files methods
 
-    private string GetSelectedSourceFile()
+    private string? GetSelectedSourceFile()
     {
         if (listViewSource.SelectedIndices.Count == 1)
         {
             return listViewSource.SelectedItems[0].SubItems[1].Text;
         }
+
         return null;
     }
 
@@ -186,6 +183,7 @@ public partial class SourceControl : UserControl
             {
                 return listViewSource.SelectedIndices[0];
             }
+
             return -1;
         }
         set
@@ -227,7 +225,7 @@ public partial class SourceControl : UserControl
         {
             var fileName = Path.GetFileName(file);
 
-            var listItem = new ListViewItem {Text = fileName};
+            var listItem = new ListViewItem { Text = fileName };
             listItem.SubItems.Add(file);
 
             listViewSource.Items.Add(listItem);
@@ -265,16 +263,23 @@ public partial class SourceControl : UserControl
         saveFileDialog1.DefaultExt      = "pdf";
         saveFileDialog1.Filter          = @"Pdf files (*.pdf)|*.pdf|All files (*.*)|*.*";
 
-        if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
+        if (saveFileDialog1.ShowDialog(this) != DialogResult.OK)
         {
-            var sourceFileName = GetSelectedSourceFile();
-            var destinationFileName = saveFileDialog1.FileName;
-
-            MoveFileInternal(sourceFileName, destinationFileName, true);
-
-            RemoveSelectedSourceFile();
-            OnSelectedIndexChanged();
+            return;
         }
+
+        var sourceFileName      = GetSelectedSourceFile();
+        var destinationFileName = saveFileDialog1.FileName;
+
+        if (string.IsNullOrEmpty(sourceFileName))
+        {
+            return;
+        }
+
+        MoveFileInternal(sourceFileName, destinationFileName, true);
+
+        RemoveSelectedSourceFile();
+        OnSelectedIndexChanged();
     }
 
 
@@ -292,7 +297,8 @@ public partial class SourceControl : UserControl
         }
         catch (IOException ioException)
         {
-            MessageBox.Show(@"Het bestand bestaat al, kies een andere bestandsnaam. " + ioException.Message, messageBoxCaption, MessageBoxButtons.OK);
+            MessageBox.Show(@"Het bestand bestaat al, kies een andere bestandsnaam. " + ioException.Message,
+                messageBoxCaption, MessageBoxButtons.OK);
         }
         catch (Exception exception)
         {
@@ -306,7 +312,7 @@ public partial class SourceControl : UserControl
         var copyEventArgs = new CopyEventArgs
         {
             FolderName = GetSelectedSourceFolder(),
-            FileName = GetSelectedSourceFile()
+            FileName   = GetSelectedSourceFile()
         };
 
         CopyFile?.Invoke(this, copyEventArgs);
@@ -322,9 +328,13 @@ public partial class SourceControl : UserControl
 
         if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
         {
-            var sourceFileName = GetSelectedSourceFile();
+            var sourceFileName      = GetSelectedSourceFile();
             var destinationFileName = saveFileDialog1.FileName;
-            CopyFileInternal(sourceFileName, destinationFileName, true);
+
+            if (!string.IsNullOrEmpty(sourceFileName))
+            {
+                CopyFileInternal(sourceFileName, destinationFileName, true);
+            }
         }
     }
 
@@ -343,7 +353,8 @@ public partial class SourceControl : UserControl
         }
         catch (IOException ioException)
         {
-            MessageBox.Show(@"Het bestand bestaat al, kies een andere bestandsnaam. " + ioException.Message, messageBoxCaption, MessageBoxButtons.OK);
+            MessageBox.Show(@"Het bestand bestaat al, kies een andere bestandsnaam. " + ioException.Message,
+                messageBoxCaption, MessageBoxButtons.OK);
         }
         catch (Exception exception)
         {
@@ -368,7 +379,12 @@ public partial class SourceControl : UserControl
     {
         var directory    = GetSelectedSourceFolder();
         var currentIndex = CurrentIndex;
-        FillListViewWithPdfDocumentsFromDirectory(directory);
+
+        if (!string.IsNullOrEmpty(directory))
+        {
+            FillListViewWithPdfDocumentsFromDirectory(directory);
+        }
+
         CurrentIndex = currentIndex;
     }
 
@@ -384,7 +400,8 @@ public partial class SourceControl : UserControl
 
         try
         {
-            var result = MessageBox.Show(@"Bestand verwijderen?", @"Verwijder bestand", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            var result = MessageBox.Show(@"Bestand verwijderen?", @"Verwijder bestand", MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Question);
 
             if (result == DialogResult.OK)
             {
@@ -571,28 +588,28 @@ public partial class SourceControl : UserControl
     #endregion
 }
 
-
 public delegate void MoveFileEventHandler(object sender, MoveEventArgs e);
-public delegate void CopyFileEventHandler(object sender, CopyEventArgs e);
-public delegate void SelectedIndexChangedEventHandler(object sender, SelectedIndexChangedEventArgs e);
 
+public delegate void CopyFileEventHandler(object sender, CopyEventArgs e);
+
+public delegate void SelectedIndexChangedEventHandler(object sender, SelectedIndexChangedEventArgs e);
 
 public class MoveEventArgs : EventArgs
 {
     public bool Canceled { get; set; }
-    public string FolderName { get; set; }
-    public string FileName { get; set; }
+    public string? FolderName { get; set; }
+    public string? FileName { get; set; }
 }
 
 public class CopyEventArgs : EventArgs
 {
     public bool Canceled { get; set; }
-    public string FolderName { get; set; }
-    public string FileName { get; set; }
+    public string? FolderName { get; set; }
+    public string? FileName { get; set; }
 }
 
 public class SelectedIndexChangedEventArgs : EventArgs
 {
-    public string FolderName { get; set; }
-    public string FileName { get; set; }
+    public string? FolderName { get; set; }
+    public string? FileName { get; set; }
 }
