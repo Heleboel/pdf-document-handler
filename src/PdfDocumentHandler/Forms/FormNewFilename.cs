@@ -14,8 +14,7 @@ public partial class FormNewFilename : Form
     private const string KeyMonthName   = "MaandNaam";
     private const string KeyYear        = "Jaar";
 
-    private readonly string _sourceFile;
-    private readonly Destination _destination;
+    private readonly Destination _destination = new();
 
 
     private FormNewFilename()
@@ -29,23 +28,25 @@ public partial class FormNewFilename : Form
         else
         {
             StartPosition = FormStartPosition.Manual;
-            Location = FormLocation;
-            Size = FormSize;
+            Location      = FormLocation;
+            Size          = FormSize;
         }
     }
 
 
-    public FormNewFilename(string sourceFile, Destination destination) : this()
+    public FormNewFilename(
+        string sourceFile,
+        Destination destination
+    ) : this()
     {
         _destination = destination;
-        _sourceFile  = sourceFile;
 
         labelDestinationNameText.Text   = destination.Name;
         labelDestinationFolderText.Text = destination.Location;
         textBoxOriginalFileName.Text    = Path.GetFileName(sourceFile);
 
         var nameTemplate = _destination.Template;
-        textBoxNewFileName.Text = string.IsNullOrEmpty(nameTemplate) ? Path.GetFileName(_sourceFile) : nameTemplate;
+        textBoxNewFileName.Text = string.IsNullOrEmpty(nameTemplate) ? Path.GetFileName(sourceFile) : nameTemplate;
 
         UpdatePreview();
     }
@@ -54,7 +55,8 @@ public partial class FormNewFilename : Form
     public string GetNewFileName()
     {
         var newFileName = ComposeNewFileName(textBoxNewFileName.Text);
-        var year = _destination.AddYearToLocation ? dateTimePicker.Value.Year.ToString() : "";
+        var year        = _destination.AddYearToLocation ? dateTimePicker.Value.Year.ToString() : "";
+
         return Path.Combine(_destination.Location, year, newFileName);
     }
 
@@ -85,8 +87,7 @@ public partial class FormNewFilename : Form
 
     private void UpdatePreview()
     {
-        var newFileName = textBoxNewFileName.Text;
-        labelPreviewText.Text = ComposeNewFileName(newFileName);
+        labelPreviewText.Text = GetNewFileName();
     }
 
 
@@ -96,23 +97,19 @@ public partial class FormNewFilename : Form
 
         var values = new Dictionary<string, object>
         {
-            {KeyDate,        dateTimePicker.Value},
-            {KeyCompany,     textBoxCompany.Text},
-            {KeyDescription, textBoxDescription.Text},
-            {KeyMonth,       dateTimePicker.Value.Month},
-            {KeyMonthName,   CultureInfo.CurrentCulture.TextInfo.ToTitleCase(dateTimePicker.Value.ToString("MMMM"))},
-            {KeyYear,        dateTimePicker.Value.Year }
+            { KeyDate,        dateTimePicker.Value },
+            { KeyCompany,     textBoxCompany.Text },
+            { KeyDescription, textBoxDescription.Text },
+            { KeyMonth,       dateTimePicker.Value.Month },
+            { KeyMonthName,   CultureInfo.CurrentCulture.TextInfo.ToTitleCase(dateTimePicker.Value.ToString("MMMM")) },
+            { KeyYear,        dateTimePicker.Value.Year }
         };
 
         var newFileName = templateResolver.Resolve(textBoxOriginalFileName.Text, values);
 
-        if (!Path.HasExtension(newFileName))
-        {
-            newFileName += Path.GetExtension(_sourceFile);
-        }
-
         return newFileName;
     }
+
 
     #region Form events
 

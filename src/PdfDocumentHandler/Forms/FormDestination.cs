@@ -5,7 +5,7 @@ namespace PdfDocumentHandler.Forms;
 
 public partial class FormDestination : Form
 {
-    private Destination _destination;
+    private Destination? _destination;
 
 
     public FormDestination()
@@ -19,8 +19,8 @@ public partial class FormDestination : Form
         else
         {
             StartPosition = FormStartPosition.Manual;
-            Location = FormLocation;
-            Size = FormSize;
+            Location      = FormLocation;
+            Size          = FormSize;
         }
     }
 
@@ -41,6 +41,8 @@ public partial class FormDestination : Form
 
     public Destination GetDestination()
     {
+        _destination ??= new();
+
         _destination.Name              = textBoxName.Text;
         _destination.Description       = textBoxDescription.Text;
         _destination.Location          = textBoxLocation.Text;
@@ -68,6 +70,8 @@ public partial class FormDestination : Form
 
     private void buttonBrowse_Click(object sender, EventArgs e)
     {
+        _destination ??= new();
+
         folderBrowserDialog.SelectedPath        = textBoxLocation.Text;
         folderBrowserDialog.ShowNewFolderButton = true;
 
@@ -81,6 +85,7 @@ public partial class FormDestination : Form
             textBoxLocation.Text  = folder;
         }
     }
+
 
     #region Form events
 
@@ -99,5 +104,4 @@ public partial class FormDestination : Form
     }
 
     #endregion
-
 }
