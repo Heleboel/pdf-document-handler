@@ -7,17 +7,17 @@ namespace PdfDocumentHandler;
 [Serializable]
 internal sealed class PdfDocumentHandlerSettings : ApplicationSettingsBase
 {
-    private const string KeyUpgradeRequired = "UpgradeRequired";
-    private const string KeyFormLocation    = "FormLocation";
-    private const string KeyFormState       = "FormState";
+    private const string KeyUpgradeRequired = nameof(UpgradeRequired);
+    private const string KeyFormLocation    = nameof(FormLocation);
+    private const string KeyFormState       = nameof(FormState);
 
 
     [UserScopedSetting]
     [DefaultSettingValue("true")]
     public bool UpgradeRequired
     {
-        get { return (bool)this[KeyUpgradeRequired]; }
-        set { this[KeyUpgradeRequired] = value; }
+        get => (bool)this[KeyUpgradeRequired];
+        set => this[KeyUpgradeRequired] = value;
     }
 
 
@@ -25,8 +25,8 @@ internal sealed class PdfDocumentHandlerSettings : ApplicationSettingsBase
     [DefaultSettingValue("20, 20")]
     public Point FormLocation
     {
-        get { return (Point)this[KeyFormLocation]; }
-        set { this[KeyFormLocation] = value; }
+        get => (Point)this[KeyFormLocation];
+        set => this[KeyFormLocation] = value;
     }
 
 
@@ -34,8 +34,8 @@ internal sealed class PdfDocumentHandlerSettings : ApplicationSettingsBase
     [DefaultSettingValue("0")]
     public FormWindowState FormState
     {
-        get { return (FormWindowState) this[KeyFormState]; }
-        set { this[KeyFormState] = value; }
+        get => (FormWindowState)this[KeyFormState];
+        set => this[KeyFormState] = value;
     }
 
 
@@ -43,8 +43,8 @@ internal sealed class PdfDocumentHandlerSettings : ApplicationSettingsBase
     [DefaultSettingValue("1225, 600")]
     public Size FormSize
     {
-        get { return (Size)this["FormSize"]; }
-        set { this["FormSize"] = value; }
+        get => (Size)this[nameof(FormSize)];
+        set => this[nameof(FormSize)] = value;
     }
 
 
@@ -52,23 +52,23 @@ internal sealed class PdfDocumentHandlerSettings : ApplicationSettingsBase
     [DefaultSettingValue("760")]
     public int SplitterDistance
     {
-        get { return (int)this["SplitterDistance"]; }
-        set { this["SplitterDistance"] = value; }
+        get => (int)this[nameof(SplitterDistance)];
+        set => this[nameof(SplitterDistance)] = value;
     }
 
 
     [UserScopedSetting]
     public List<string> SourceFolders
     {
-        get { return (List<string>) this["SourceFolders"]; }
-        set { this["SourceFolders"] = value; }
+        get => (List<string>)this[nameof(SourceFolders)];
+        set => this[nameof(SourceFolders)] = value;
     }
 
 
     [UserScopedSetting]
     public List<Destination> Destinations
     {
-        get { return (List<Destination>)this["Destinations"]; }
-        set { this["Destinations"] = value; }
+        get => (List<Destination>)this[nameof(Destinations)] ?? new List<Destination>();
+        set => this[nameof(Destinations)] = value;
     }
 }

@@ -364,7 +364,7 @@ public partial class SourceControl : UserControl
     }
 
 
-    private void RefreshFiles()
+    public void RefreshFiles()
     {
         var directory    = GetSelectedSourceFolder();
         var currentIndex = CurrentIndex;
